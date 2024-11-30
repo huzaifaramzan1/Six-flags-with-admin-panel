@@ -73,11 +73,25 @@
             
         }
 
-        .navbar-brand img {
-            height: 100px; 
-            width: 180px;
-            margin-left: -150px;
-        }
+        .logo-img {
+    max-height: 80px; /* Restrict logo height */
+    max-width: 100px; /* Restrict logo width */
+    position: relative; /* Enable position adjustments */
+    left: -100px; /* Shift the logo left on larger screens */
+}
+
+/* Adjustments for smaller screens */
+@media (max-width: 576px) {
+    .logo-img {
+        left: 0; /* Remove left offset on small devices */
+        margin-left: auto; /* Center align the logo */
+        margin-right: auto; /* Center align the logo */
+        display: block; /* Ensure proper centering */
+    }
+}
+
+
+
 
         .nav-link {
             color: white !important;
@@ -387,7 +401,8 @@ body {
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <img src="assets/output-onlinetools.png" alt="Logo"> 
+                <img src="assets/output-onlinetools.png" alt="Logo" class="img-fluid logo-img">
+    
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -503,5 +518,7 @@ body {
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.min.js"></script>
+
 </body>
 </html>
