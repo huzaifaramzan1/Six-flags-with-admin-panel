@@ -74,10 +74,10 @@
         }
 
         .logo-img {
-    max-height: 80px; /* Restrict logo height */
-    max-width: 100px; /* Restrict logo width */
+    height: 90px; /* Restrict logo height */
+    width: 120px; /* Restrict logo width */
     position: relative; /* Enable position adjustments */
-    left: -100px; /* Shift the logo left on larger screens */
+    left: -80px; /* Shift the logo left on larger screens */
 }
 
 /* Adjustments for smaller screens */
@@ -109,7 +109,7 @@
     margin-top: 5%;
     z-index: 2;
     margin-bottom: 450px;
-    color: #b8b8b8;
+    color: #969696;
     padding-right: 100px;
     
 }
@@ -454,72 +454,82 @@ body {
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-analytics.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-
+      
+        // Firebase configuration
         const firebaseConfig = {
-    apiKey: "AIzaSyBXwENPHzB-FfGxXIardKQDWGdgIzs5OnA",
-    authDomain: "adminpanel6flags.firebaseapp.com",
-    projectId: "adminpanel6flags",
-    storageBucket: "adminpanel6flags.firebasestorage.app",
-    messagingSenderId: "693595279762",
-    appId: "1:693595279762:web:303f5404ed33447b93714b",
-    measurementId: "G-DF4QKY7DRV"
-  };
-
+          apiKey: "AIzaSyBXwENPHzB-FfGxXIardKQDWGdgIzs5OnA",
+          authDomain: "adminpanel6flags.firebaseapp.com",
+          projectId: "adminpanel6flags",
+          storageBucket: "adminpanel6flags.firebasestorage.app",
+          messagingSenderId: "693595279762",
+          appId: "1:693595279762:web:303f5404ed33447b93714b",
+          measurementId: "G-DF4QKY7DRV"
+        };
+      
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
-
+      
+        // Goal and initial values
         const goal = 23000000;
-        let gathered = 12000000;  
+        let gathered = 12000000; // Initial value, will be updated from Firestore
+      
+        // Get DOM elements
         const customProgressBar = document.getElementById('custom-progress-bar');
         const progressText = document.getElementById('progress-text');
         const bgVideo = document.getElementById('bg-video');
-
+      
+        // Video sources for the progress milestones
         const videoSources = [
-            "assets/0-5.mp4", "assets/5-10.mp4", "assets/10-15.mp4",
-            "assets/15-20.mp4", "assets/20-25.mp4", "assets/25-30.mp4",
-            "assets/30-35.mp4", "assets/35-40.mp4", "assets /40-45.mp4", "assets/45-50.mp4", "assets/50-55.mp4", "assets/55-60.mp4",
-            "assets/60-65.mp4", "assets/65-70.mp4", "assets/70-75.mp4",
-            "assets/75-80.mp4", "assets/80-90.mp4", "assets/90-100.mp4"
+          "assets/0-5.mp4", "assets/5-10.mp4", "assets/10-15.mp4",
+          "assets/15-20.mp4", "assets/20-25.mp4", "assets/25-30.mp4",
+          "assets/30-35.mp4", "assets/35-40.mp4", "assets/40-45.mp4", "assets/45-50.mp4", "assets/50-55.mp4",
+          "assets/55-60.mp4", "assets/60-65.mp4", "assets/65-70.mp4", "assets/70-75.mp4",
+          "assets/75-80.mp4", "assets/80-90.mp4", "assets/90-100.mp4"
         ];
-
-     function    updateProgress() {
-            const progressPercentage = Math.min((gathered / goal) * 100, 100);
-            customProgressBar.style.setProperty('--p', progressPercentage);
-            progressText.innerText = Math.round(progressPercentage) + '%';
-            document.getElementById('current-value').innerText = '$' + gathered.toLocaleString();
-
-            const videoIndex = Math.floor(progressPercentage / 5);  
-
-            if (videoIndex < videoSources.length) {
-                bgVideo.src = videoSources[videoIndex];
-                bgVideo.load();
-                bgVideo.play();
-            }
+      
+        // Function to update progress bar and background video based on gathered value
+        function updateProgress() {
+          const progressPercentage = Math.min((gathered / goal) * 100, 100);
+          customProgressBar.style.setProperty('--p', progressPercentage);  // Update progress bar CSS
+          progressText.innerText = Math.round(progressPercentage) + '%';  // Update percentage text
+          document.getElementById('current-value').innerText = '$' + gathered.toLocaleString();  // Update monetary value
+      
+          // Update background video based on the percentage
+          const videoIndex = Math.floor(progressPercentage / 5);  // Each video represents a 5% range
+          if (videoIndex < videoSources.length) {
+            bgVideo.src = videoSources[videoIndex];
+            bgVideo.load();
+            bgVideo.play();
+          }
         }
-
+      
+        // Fetch 'gathered' value from Firestore
         async function fetchGatheredValue() {
-            const userDoc = doc(db, "users", "1j82r8nb8ZTkRvUbi2en"); 
-            const docSnap = await getDoc(userDoc);
-
-            if (docSnap.exists()) {
-                gathered = docSnap.data().user;  
-                updateProgress();
-            } else {
-                console.error("No such document!");
-            }
+          const userDoc = doc(db, "users", "1j82r8nb8ZTkRvUbi2en");  // Change to your actual document ID
+          const docSnap = await getDoc(userDoc);
+      
+          if (docSnap.exists()) {
+            gathered = docSnap.data().user;  // Assuming the field is named 'user'
+            updateProgress();  // Update progress after gathering data
+          } else {
+            console.error("No such document!");
+          }
         }
-
+      
+        // Window load event
         window.addEventListener('load', function() {
-            const preloader = document.getElementById('preloader');
-            preloader.classList.add('fade-out');
-
-            setTimeout(function() {
-                preloader.style.display = 'none';
-                fetchGatheredValue();  
-                        }, 500); 
+          const preloader = document.getElementById('preloader');
+          preloader.classList.add('fade-out');  // Fade out preloader
+      
+          // Hide preloader after a short delay and then fetch data from Firestore
+          setTimeout(function() {
+            preloader.style.display = 'none';
+            fetchGatheredValue();  // Fetch and update the progress based on Firebase data
+          }, 500);
         });
-    </script>
+      </script>
+      
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.min.js"></script>
