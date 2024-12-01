@@ -453,7 +453,10 @@ body {
           <div class="loadercoaster__cart"></div>
         </div>
       </div>
-
+    <!-- Include confetti library -->
+    <script src="https://cdn.jsdelivr.net/npm/@tsparticles/confetti@3.0.3/tsparticles.confetti.bundle.min.js"></script>
+    
+    <audio id="celebration-sound" src="assets/celebration.mp3" preload="auto"></audio>
 
       <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
@@ -483,6 +486,8 @@ body {
         const customProgressBar = document.getElementById('custom-progress-bar');
         const progressText = document.getElementById('progress-text');
         const bgVideo = document.getElementById('bg-video');
+        const celebrationSound = document.getElementById('celebration-sound');
+
       
         // Video sources for the progress milestones
         const videoSources = [
@@ -507,8 +512,73 @@ body {
                 bgVideo.load();
                 bgVideo.play();
             }
+
+            // Trigger celebration if goal is reached
+            if (progressPercentage >= 100) {
+                startCelebration();
+            }
         }
-    
+    // Function to start the celebration
+    function startCelebration() {
+        celebrationSound.play(); // Play celebration sound
+        // Fireworks effect
+        const duration = 15 * 1000,
+            animationEnd = Date.now() + duration,
+            defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+        function randomInRange(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        const interval = setInterval(function() {
+            const timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
+
+            const particleCount = 50 * (timeLeft / duration);
+
+            confetti(
+                Object.assign({}, defaults, {
+                    particleCount,
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+                })
+            );
+            confetti(
+                Object.assign({}, defaults, {
+                    particleCount,
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+                })
+            );
+        }, 250);
+
+        // School pride effect
+        const end = Date.now() + 15 * 1000;
+        const colors = ["#bb0000", "#ffffff"];
+
+        (function frame() {
+            confetti({
+                particleCount: 2,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: colors,
+            });
+
+            confetti({
+                particleCount : 2,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: colors,
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        })();
+    }
         // Fetch 'gathered' value from Firestore
         async function fetchGatheredValue() {
             const userDoc = doc(db, "users", "1j82r8nb8ZTkRvUbi2en");  // Change to your actual document ID
