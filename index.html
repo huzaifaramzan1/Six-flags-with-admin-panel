@@ -523,7 +523,7 @@ body {
     function startCelebration() {
     celebrationSound.play(); // Play celebration sound
     startFireworks();
-    startSchoolPride();
+    
     startStarConfetti();
 }
 
@@ -550,35 +550,35 @@ function startFireworks() {
                 origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
             })
         );
-    }, 250); // Fireworks every 250ms
+    }, 1150); // Fireworks every 250ms
 }
 
 // Function for school pride effect
-function startSchoolPride() {
-    const colors = ["#bb0000", "#ffffff"];
+// function startSchoolPride() {
+//     const colors = ["#bb0000", "#ffffff"];
 
-    function frame() {
-        confetti({
-            particleCount: 2,
-            angle: 60,
-            spread: 55,
-            origin: { x: 0 },
-            colors: colors,
-        });
+//     function frame() {
+//         confetti({
+//             particleCount: 2,
+//             angle: 60,
+//             spread: 55,
+//             origin: { x: 0 },
+//             colors: colors,
+//         });
 
-        confetti({
-            particleCount: 2,
-            angle: 120,
-            spread: 55,
-            origin: { x: 1 },
-            colors: colors,
-        });
+//         confetti({
+//             particleCount: 2,
+//             angle: 120,
+//             spread: 55,
+//             origin: { x: 1 },
+//             colors: colors,
+//         });
 
-        requestAnimationFrame(frame);
-    }
+//         requestAnimationFrame(frame);
+//     }
 
-    frame(); // Start the school pride effect
-}
+//     frame(); // Start the school pride effect
+// }
 
 // Function for star confetti effect
 function startStarConfetti() {
