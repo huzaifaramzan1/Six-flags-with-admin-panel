@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    
     <link rel="stylesheet" href="fonts/stylesheet.css">
     <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -462,7 +463,7 @@ body {
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-analytics.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-      
+        import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
         // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBXwENPHzB-FfGxXIardKQDWGdgIzs5OnA",
@@ -520,65 +521,81 @@ body {
         }
     // Function to start the celebration
     function startCelebration() {
-        celebrationSound.play(); // Play celebration sound
-        // Fireworks effect
-        const duration = 15 * 1000,
-            animationEnd = Date.now() + duration,
-            defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+    celebrationSound.play(); // Play celebration sound
+    startFireworks();
+    startSchoolPride();
+    startStarConfetti();
+}
 
-        function randomInRange(min, max) {
-            return Math.random() * (max - min) + min;
-        }
+// Function for fireworks effect
+function startFireworks() {
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
 
-        const interval = setInterval(function() {
-            const timeLeft = animationEnd - Date.now();
-
-            if (timeLeft <= 0) {
-                return clearInterval(interval);
-            }
-
-            const particleCount = 50 * (timeLeft / duration);
-
-            confetti(
-                Object.assign({}, defaults, {
-                    particleCount,
-                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-                })
-            );
-            confetti(
-                Object.assign({}, defaults, {
-                    particleCount,
-                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-                })
-            );
-        }, 250);
-
-        // School pride effect
-        const end = Date.now() + 15 * 1000;
-        const colors = ["#bb0000", "#ffffff"];
-
-        (function frame() {
-            confetti({
-                particleCount: 2,
-                angle: 60,
-                spread: 55,
-                origin: { x: 0 },
-                colors: colors,
-            });
-
-            confetti({
-                particleCount : 2,
-                angle: 120,
-                spread: 55,
-                origin: { x: 1 },
-                colors: colors,
-            });
-
-            if (Date.now() < end) {
-                requestAnimationFrame(frame);
-            }
-        })();
+    function randomInRange(min, max) {
+        return Math.random() * (max - min) + min;
     }
+
+    setInterval(function() {
+        const particleCount = 50;
+
+        confetti(
+            Object.assign({}, defaults, {
+                particleCount,
+                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+            })
+        );
+        confetti(
+            Object.assign({}, defaults, {
+                particleCount,
+                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+            })
+        );
+    }, 250); // Fireworks every 250ms
+}
+
+// Function for school pride effect
+function startSchoolPride() {
+    const colors = ["#bb0000", "#ffffff"];
+
+    function frame() {
+        confetti({
+            particleCount: 2,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors: colors,
+        });
+
+        confetti({
+            particleCount: 2,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors: colors,
+        });
+
+        requestAnimationFrame(frame);
+    }
+
+    frame(); // Start the school pride effect
+}
+
+// Function for star confetti effect
+function startStarConfetti() {
+    setInterval(function() {
+        confetti({
+            particleCount: 5, // Adjust the number of stars emitted per interval
+            angle: Math.random() * 360,
+            spread: Math.random() * 50 + 50, // Random spread between 50 and 100
+            origin: {
+                x: Math.random(), // Random x position
+                y: Math.random() - 0.2 // Random y position, slightly above the bottom
+            },
+            shapes: ['star'], // Use star shape
+            colors: ['gold'] // Use a gold color for stars
+        });
+    }, 100); // Emit stars every 100ms
+}
         // Fetch 'gathered' value from Firestore
         async function fetchGatheredValue() {
             const userDoc = doc(db, "users", "1j82r8nb8ZTkRvUbi2en");  // Change to your actual document ID
@@ -605,6 +622,35 @@ body {
                 fetchGatheredValue();  // Fetch and update the progress based on Firebase data
             }, 500);
         });
+
+        // Function to listen for changes in the 'gathered' value from Firestore
+async function listenForGatheredValue() {
+    const userDoc = doc(db, "users", "1j82r8nb8ZTkRvUbi2en"); // Change to your actual document ID
+
+    // Set up a real-time listener
+    onSnapshot(userDoc, (docSnap) => {
+        if (docSnap.exists()) {
+            let fetchedGathered = docSnap.data().user; // Assuming the field is named 'user'
+            fetchedGathered = fetchedGathered.replace(/,/g, ''); // Remove commas if any
+            gathered = parseInt(fetchedGathered, 10); // Convert to number
+            updateProgress(); // Update progress after gathering data
+        } else {
+            console.error("No such document!");
+        }
+    });
+}
+
+// Window load event
+window.addEventListener('load', function() {
+    const preloader = document.getElementById('preloader');
+    preloader.classList.add('fade-out'); // Fade out preloader
+
+    // Hide preloader after a short delay and then start listening for updates from Firestore
+    setTimeout(function() {
+        preloader.style.display = 'none';
+        listenForGatheredValue(); // Start listening for updates
+    }, 500);
+});
     </script>
     
       
