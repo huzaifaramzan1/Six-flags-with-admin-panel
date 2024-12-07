@@ -459,11 +459,12 @@ body {
     
     <audio id="celebration-sound" src="assets/celebration.mp3" preload="auto"></audio>
 
-      <script type="module">
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-analytics.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
         import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+
         // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBXwENPHzB-FfGxXIardKQDWGdgIzs5OnA",
@@ -474,38 +475,40 @@ body {
             appId: "1:693595279762:web:303f5404ed33447b93714b",
             measurementId: "G-DF4QKY7DRV"
         };
-    
+
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
-      
+
         // Goal and initial values
         const goal = 23000000;
         let gathered = 12000000; // Initial value, will be updated from Firestore
-      
+
         // Get DOM elements
         const customProgressBar = document.getElementById('custom-progress-bar');
         const progressText = document.getElementById('progress-text');
         const bgVideo = document.getElementById('bg-video');
-        const celebrationSound = document.getElementById('celebration-sound');
+        const celebrationSound = document.getElementById('cele bration-sound');
 
-      
+        let confettiInterval; // Variable to store the confetti interval
+        let celebrationActive = false; // Track if celebration is active
+
         // Video sources for the progress milestones
         const videoSources = [
             "assets/0-5.mp4", "assets/5-10.mp4", "assets/10-15.mp4",
             "assets/15-20.mp4", "assets/20-25.mp4", "assets/25-30.mp4",
             "assets/30-35.mp4", "assets/35-40.mp4", "assets/40-45.mp4", "assets/45-50.mp4", "assets/50-55.mp4",
             "assets/55-60.mp4", "assets/60-65.mp4", "assets/65-70.mp4", "assets/70-75.mp4",
-            "assets/75-80.mp4", "assets/80-85.mp4", "assets/85-90.mp4", "assets/90-95.mp4", "assets/95-100.mp4", "assets/95-100.mp4"
+            "assets/75-80.mp4", "assets/80-85.mp4", "assets/85-90.mp4", "assets/90-95.mp4", "assets/95-100.mp4"
         ];
-    
+
         // Function to update progress bar and background video based on gathered value
         function updateProgress() {
             const progressPercentage = Math.min((gathered / goal) * 100, 100);
             customProgressBar.style.setProperty('--p', progressPercentage);  // Update progress bar CSS
             progressText.innerText = Math.round(progressPercentage) + '%';  // Update percentage text
             document.getElementById('current-value').innerText = '$' + gathered.toLocaleString();  // Update monetary value with commas
-      
+
             // Update background video based on the percentage
             const videoIndex = Math.floor(progressPercentage / 5);  // Each video represents a 5% range
             if (videoIndex < videoSources.length) {
@@ -515,92 +518,105 @@ body {
             }
 
             // Trigger celebration if goal is reached
-            if (progressPercentage >= 100) {
+            if (progressPercentage >= 100 && !celebrationActive) {
                 startCelebration();
+            } else if (progressPercentage < 100 && celebrationActive) {
+                stopCelebration(); // Stop celebration if progress drops below 100%
             }
         }
-    // Function to start the celebration
-    function startCelebration() {
-    celebrationSound.play(); // Play celebration sound
-    startFireworks();
-    startSchoolPride();
-    startStarConfetti();
-}
 
-// Function for fireworks effect
-function startFireworks() {
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+        // Function to start the celebration
+        function startCelebration() {
+            celebrationSound.play(); // Play celebration sound
+            startFireworks();
+            startSchoolPride();
+            startStarConfetti();
+            celebrationActive = true; // Mark celebration as active
+        }
 
-    function randomInRange(min, max) {
-        return Math.random() * (max - min) + min;
-    }
+        // Function to stop the celebration
+        function stopCelebration() {
+            celebrationSound.pause();
+            celebrationSound.currentTime = 0; // Reset sound to start
+            clearInterval(confettiInterval); // Stop confetti interval
+            celebrationActive = false; // Mark celebration as inactive
+        }
 
-    setInterval(function() {
-        const particleCount = 50;
+        // Fireworks effect
+        function startFireworks() {
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
 
-        confetti(
-            Object.assign({}, defaults, {
-                particleCount,
-                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-            })
-        );
-        confetti(
-            Object.assign({}, defaults, {
-                particleCount,
-                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-            })
-        );
-    }, 250); // Fireworks every 250ms
-}
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
 
-// Function for school pride effect
-function startSchoolPride() {
-    const colors = ["#bb0000", "#ffffff"];
+            confettiInterval = setInterval(function() {
+                const particleCount = 50;
 
-    function frame() {
-        confetti({
-            particleCount: 2,
-            angle: 60,
-            spread: 55,
-            origin: { x: 0 },
-            colors: colors,
-        });
+                confetti(
+                    Object.assign({}, defaults, {
+                        particleCount,
+                        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+                    })
+                );
+                confetti(
+                    Object.assign({}, defaults, {
+                        particleCount,
+                        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+                    })
+                );
+            }, 250); // Fireworks every 250ms
+        }
 
-        confetti({
-            particleCount: 2,
-            angle: 120,
-            spread: 55,
-            origin: { x: 1 },
-            colors: colors,
-        });
+        // Function for school pride effect
+        function startSchoolPride() {
+            const colors = ["#bb0000", "#ffffff"];
 
-        requestAnimationFrame(frame);
-    }
+            function frame() {
+                confetti({
+                    particleCount: 2,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: colors,
+                });
 
-    frame(); // Start the school pride effect
-}
+                confetti({
+                    particleCount: 2,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: colors,
+                });
 
-// Function for star confetti effect
-function startStarConfetti() {
-    setInterval(function() {
-        confetti({
-            particleCount: 5, // Adjust the number of stars emitted per interval
-            angle: Math.random() * 360,
-            spread: Math.random() * 50 + 50, // Random spread between 50 and 100
-            origin: {
-                x: Math.random(), // Random x position
-                y: Math.random() - 0.2 // Random y position, slightly above the bottom
-            },
-            shapes: ['star'], // Use star shape
-            colors: ['gold'] // Use a gold color for stars
-        });
-    }, 100); // Emit stars every 100ms
-}
+                requestAnimationFrame(frame);
+            }
+
+            frame(); // Start the school pride effect
+        }
+
+        // Function for star confetti effect
+        function startStarConfetti() {
+            confettiInterval = setInterval(function() {
+                confetti({
+                    particleCount: 5, // Adjust the number of stars emitted per interval
+                    angle: Math.random() * 360,
+                    spread: Math.random() * 50 + 50, // Random spread ... (rest of the code) ```html
+                    origin: {
+                        x: Math.random(), // Random x position
+                        y: Math.random() - 0.2 // Random y position, slightly above the bottom
+                    },
+                    shapes: ['star'], // Use star shape
+                    colors: ['gold'] // Use a gold color for stars
+                });
+            }, 100); // Emit stars every 100ms
+        }
+
         // Fetch 'gathered' value from Firestore
         async function fetchGatheredValue() {
             const userDoc = doc(db, "users", "1j82r8nb8ZTkRvUbi2en");  // Change to your actual document ID
             const docSnap = await getDoc(userDoc);
-    
+
             if (docSnap.exists()) {
                 let fetchedGathered = docSnap.data().user;  // Assuming the field is named 'user'
                 fetchedGathered = fetchedGathered.replace(/,/g, '');  // Remove commas if any
@@ -610,47 +626,35 @@ function startStarConfetti() {
                 console.error("No such document!");
             }
         }
-    
+
+        // Function to listen for changes in the 'gathered' value from Firestore
+        async function listenForGatheredValue() {
+            const userDoc = doc(db, "users", "1j82r8nb8ZTkRvUbi2en"); // Change to your actual document ID
+
+            // Set up a real-time listener
+            onSnapshot(userDoc, (docSnap) => {
+                if (docSnap.exists()) {
+                    let fetchedGathered = docSnap.data().user; // Assuming the field is named 'user'
+                    fetchedGathered = fetchedGathered.replace(/,/g, ''); // Remove commas if any
+                    gathered = parseInt(fetchedGathered, 10); // Convert to number
+                    updateProgress(); // Update progress after gathering data
+                } else {
+                    console.error("No such document!");
+                }
+            });
+        }
+
         // Window load event
         window.addEventListener('load', function() {
             const preloader = document.getElementById('preloader');
-            preloader.classList.add('fade-out');  // Fade out preloader
-    
-            // Hide preloader after a short delay and then fetch data from Firestore
+            preloader.classList.add('fade-out'); // Fade out preloader
+
+            // Hide preloader after a short delay and then start listening for updates from Firestore
             setTimeout(function() {
                 preloader.style.display = 'none';
-                fetchGatheredValue();  // Fetch and update the progress based on Firebase data
+                listenForGatheredValue(); // Start listening for updates
             }, 500);
         });
-
-        // Function to listen for changes in the 'gathered' value from Firestore
-async function listenForGatheredValue() {
-    const userDoc = doc(db, "users", "1j82r8nb8ZTkRvUbi2en"); // Change to your actual document ID
-
-    // Set up a real-time listener
-    onSnapshot(userDoc, (docSnap) => {
-        if (docSnap.exists()) {
-            let fetchedGathered = docSnap.data().user; // Assuming the field is named 'user'
-            fetchedGathered = fetchedGathered.replace(/,/g, ''); // Remove commas if any
-            gathered = parseInt(fetchedGathered, 10); // Convert to number
-            updateProgress(); // Update progress after gathering data
-        } else {
-            console.error("No such document!");
-        }
-    });
-}
-
-// Window load event
-window.addEventListener('load', function() {
-    const preloader = document.getElementById('preloader');
-    preloader.classList.add('fade-out'); // Fade out preloader
-
-    // Hide preloader after a short delay and then start listening for updates from Firestore
-    setTimeout(function() {
-        preloader.style.display = 'none';
-        listenForGatheredValue(); // Start listening for updates
-    }, 500);
-});
     </script>
     
       
