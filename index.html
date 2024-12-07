@@ -501,8 +501,9 @@ body {
     
         // Function to update progress bar and background video based on gathered value
         function updateProgress() {
-            const progressPercentage = Math.min((gathered / goal) * 100, 100);
-            customProgressBar.style.setProperty('--p', progressPercentage);  // Update progress bar CSS
+            const progressPercentage = (gathered / goal) * 100;  // Calculate percentage
+
+    customProgressBar.style.setProperty('--p', Math.min(progressPercentage, 100));  // Update progress bar CSS
             progressText.innerText = Math.round(progressPercentage) + '%';  // Update percentage text
             document.getElementById('current-value').innerText = '$' + gathered.toLocaleString();  // Update monetary value with commas
       
