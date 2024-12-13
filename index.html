@@ -525,12 +525,14 @@ body {
     celebrationSound.play(); // Play celebration sound
     startFireworks();
    
-    startStarConfetti();
+    // startStarConfetti();
+    startSchoolPride();
+   
 }
 
-// Function for fireworks effect
+
 function startFireworks() {
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+    const defaults = { startVelocity: 20, spread: 160, ticks: 20, zIndex: 0 };
 
     function randomInRange(min, max) {
         return Math.random() * (max - min) + min;
@@ -555,48 +557,48 @@ function startFireworks() {
 }
 
 
-// function startSchoolPride() {
-//     const colors = ["#bb0000", "#ffffff"];
+function startSchoolPride() {
+    const colors = ["#bb0000", "#ffffff"];
 
-//     function frame() {
-//         confetti({
-//             particleCount: 1,
-//             angle: 60,
-//             spread: 15,
-//             origin: { x: 0 },
-//             colors: colors,
-//         });
-
-//         confetti({
-//             particleCount: 1,
-//             angle: 120,
-//             spread: 55,
-//             origin: { x: 1 },
-//             colors: colors,
-//         });
-
-//         requestAnimationFrame(frame);
-//     }
-
-//     frame(); // Start the school pride effect
-// }
-
-
-function startStarConfetti() {
-    setInterval(function() {
+    function frame() {
         confetti({
-            particleCount: 5, // Adjust the number of stars emitted per interval
-            angle: Math.random() * 360,
-            spread: Math.random() * 50 + 50, // Random spread between 50 and 100
-            origin: {
-                x: Math.random(), // Random x position
-                y: Math.random() - 0.2 // Random y position, slightly above the bottom
-            },
-            shapes: ['star'], // Use star shape
-            colors: ['gold'] // Use a gold color for stars
+            particleCount: 1,
+            angle: 60,
+            spread: 5,
+            origin: { x: 0 },
+            colors: colors,
         });
-    }, 100); // Emit stars every 100ms
+
+        confetti({
+            particleCount: 1,
+            angle: 120,
+            spread: 45,
+            origin: { x: 1 },
+            colors: colors,
+        });
+
+        requestAnimationFrame(frame);
+    }
+
+    frame(); // Start the school pride effect
 }
+
+
+// function startStarConfetti() {
+//     setInterval(function() {
+//         confetti({
+//             particleCount: 5, // Adjust the number of stars emitted per interval
+//             angle: Math.random() * 360,
+//             spread: Math.random() * 50 + 50, // Random spread between 50 and 100
+//             origin: {
+//                 x: Math.random(), // Random x position
+//                 y: Math.random() - 0.2 // Random y position, slightly above the bottom
+//             },
+//             shapes: ['star'], // Use star shape
+//             colors: ['gold'] // Use a gold color for stars
+//         });
+//     }, 100); // Emit stars every 100ms
+// }
         // Fetch 'gathered' value from Firestore
         async function fetchGatheredValue() {
             const userDoc = doc(db, "users", "1j82r8nb8ZTkRvUbi2en");  // Change to your actual document ID
